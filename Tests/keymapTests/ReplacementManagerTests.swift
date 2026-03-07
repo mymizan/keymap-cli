@@ -3,9 +3,10 @@ import XCTest
 
 final class ReplacementManagerTests: XCTestCase {
 
-    func testExample() throws {
-        // This is an example test case.
-        // Replace with actual tests once ReplacementManager is implemented.
+    func testPlaceholder() throws {
+        // This is a placeholder test suite for ReplacementManager.
+        // Will be populated in Phase 4 — Data Manipulation
+        // when ReplacementManager is fully implemented.
         XCTAssertTrue(true)
     }
 
