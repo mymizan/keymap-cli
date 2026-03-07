@@ -2,6 +2,55 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.0] - 2026-03-07
+
+### Added
+- Implement ReplacementManager class with core business logic
+  - addShortcut() - Add new text replacements with duplicate detection
+  - removeShortcut() - Remove replacements by shortcut
+  - updateShortcut() - Update expansion text while preserving state
+  - listShortcuts() - Get all replacements sorted alphabetically
+  - getReplacement() - Find specific replacement by shortcut
+  - count() - Get total number of replacements
+- Implement ReplacementManagerError enum for error handling
+  - shortcutNotFound, shortcutAlreadyExists
+  - emptyShortcut, emptyExpansion
+  - Descriptive error messages
+- Implement OutputFormatter for list formatting
+  - Format replacements in table columns
+  - Align shortcut and expansion columns
+  - Handle empty lists gracefully
+- Update main.swift to use ReplacementManager
+  - Load existing replacements from plist
+  - Process commands with manager
+  - Display appropriate success/error messages
+  - Proper exit codes on error
+- Create 25 ReplacementManagerTests covering:
+  - Add operations (single, multiple, duplicates, validation)
+  - Remove operations (existing, non-existent, multiple items)
+  - Update operations (valid, non-existent, state preservation)
+  - List operations (sorting, consistency, empty state)
+  - Integration workflows (add-update-remove chains)
+  - Error handling and descriptions
+
+### Changed
+- Replace command acknowledgement with actual functionality
+- ReplacementManagerTests now contains full test suite (25 tests)
+
+### Status
+- Phase 1: Project Setup — ✅ Complete
+- Phase 2: CLI Argument Parsing — ✅ Complete
+- Phase 3: Plist Reading — ✅ Complete
+- Phase 4: Data Manipulation — ✅ Complete
+- Phase 5: Plist Writing — 🔲 Pending
+- Phase 6: Output Formatting — 🔲 Pending
+- Phase 7: Error Handling — 🔲 Pending
+- Phase 8: Testing — 🔲 Pending
+
+### Test Results
+- All 49 tests passing (14 CommandParser + 10 PlistReader + 25 ReplacementManager)
+- Build: ✅ Success
+
 ## [0.3.0] - 2026-03-07
 
 ### Added
