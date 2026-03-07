@@ -79,14 +79,7 @@ class PlistWriter {
         )
         
         // Create backup before writing
-        let backupPath = plistPath + ".backup"
-        if fileManager.fileExists(atPath: plistPath) {
-            do {
-                try fileManager.copyItem(atPath: plistPath, toPath: backupPath)
-            } catch {
-                throw PlistWriterError.cannotCreateBackup
-            }
-        }
+        try backupExistingPlist()
         
         // Write to file
         let success = fileManager.createFile(
@@ -97,6 +90,28 @@ class PlistWriter {
         
         guard success else {
             throw PlistWriterError.writeFailure("Could not create file at \(plistPath)")
+        }
+    }
+
+    /// Internal helper used by `writeReplacements` and tests.
+    /// Creates a new backup at the given path. If an existing backup file
+    /// is present, it is removed first to avoid copy errors.
+    /// - Parameters:
+    ///   - path: The path of the plist file to back up. Defaults to the
+    ///           standard `plistPath` used by the app.
+    /// - Throws: `PlistWriterError.cannotCreateBackup` if the operation fails.
+    static func backupExistingPlist(at path: String = plistPath) throws {
+        let fileManager = FileManager.default
+        let backupPath = path + ".backup"
+        if fileManager.fileExists(atPath: path) {
+            do {
+                if fileManager.fileExists(atPath: backupPath) {
+                    try fileManager.removeItem(atPath: backupPath)
+                }
+                try fileManager.copyItem(atPath: path, toPath: backupPath)
+            } catch {
+                throw PlistWriterError.cannotCreateBackup
+            }
         }
     }
 }

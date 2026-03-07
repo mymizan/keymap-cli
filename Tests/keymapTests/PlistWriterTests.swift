@@ -198,6 +198,29 @@ final class PlistWriterTests: XCTestCase {
         XCTAssertTrue(PlistWriterError.writeFailure("test").description.contains("write"))
     }
     
+    // Regression test for BUG-001: backup helper should remove old file before copying
+    func testBackupIsRecreated() throws {
+        let plistPath = createTestPlist()
+        defer {
+            try? FileManager.default.removeItem(atPath: plistPath)
+            try? FileManager.default.removeItem(atPath: plistPath + ".backup")
+        }
+
+        let backupPath = plistPath + ".backup"
+
+        // create initial backup file with known content
+        FileManager.default.createFile(atPath: backupPath, contents: Data("old".utf8), attributes: nil)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: backupPath))
+
+        // call helper directly with our temporary plist path; should overwrite existing backup
+        try PlistWriter.backupExistingPlist(at: plistPath)
+
+        // verify backup file still exists and was replaced (not equal to "old")
+        let finalData = FileManager.default.contents(atPath: backupPath)
+        XCTAssertNotNil(finalData)
+        XCTAssertNotEqual(String(data: finalData!, encoding: .utf8), "old")
+    }
+    
     // Test conversion to dictionaries
     func testConversionToDict() {
         let item = ReplacementItem(shortcut: "test.key", expansion: "test expansion", enabled: true)

@@ -61,6 +61,12 @@ All notable changes to this project will be documented in this file.
 - All 113 tests passing (including new integration tests)
 - Build: ✅ Success
 
+## [0.9.1] - 2026-03-07
+
+### Fixed
+- **BUG-001**: Write operation failed when a previous backup file already existed.  Backup creation now removes any old `.backup` file before copying, preventing permission or path errors.
+- Added regression test (`testBackupIsRecreated`) and exposed `PlistWriter.backupExistingPlist(at:)` helper for easier testing.
+
 ## [0.9.0] - 2026-03-07
 
 ### Added
