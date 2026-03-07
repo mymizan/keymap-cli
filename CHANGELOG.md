@@ -2,6 +2,126 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.0] - 2026-03-07
+
+### Added
+- Implement comprehensive ErrorHandler class for enhanced error handling
+  - Context-aware error messages with recovery suggestions
+  - Environment validation before file operations
+  - Input validation for shortcuts and expansions
+  - File system error handling with specific error codes
+  - Recovery hints for common issues (permissions, missing files, corruption)
+- Enhance main.swift with error handling integration
+  - Pre-operation environment checks for add/remove/update commands
+  - Input validation before processing commands
+  - Colored success/error/warning messages using OutputFormatter
+  - Graceful handling of plist loading failures
+  - Proper exit codes for different error conditions
+- Create ErrorHandlerTests with 18 comprehensive test cases:
+  - Manager error handling (already exists, not found, empty inputs)
+  - Writer error handling (file not found, backup creation, serialization)
+  - Reader error handling (file not found, invalid format, decoding errors)
+  - Context-aware error messages
+  - Input validation (empty, whitespace, valid inputs)
+
+### Changed
+- main.swift now includes comprehensive error handling and validation
+- Error messages now include helpful recovery suggestions
+- Output uses colored formatting for better user experience
+
+### Status
+- Phase 1: Project Setup — ✅ Complete
+- Phase 2: CLI Argument Parsing — ✅ Complete
+- Phase 3: Plist Reading — ✅ Complete
+- Phase 4: Data Manipulation — ✅ Complete
+- Phase 5: Plist Writing — ✅ Complete
+- Phase 6: Output Formatting — ✅ Complete
+- Phase 7: Error Handling — ✅ Complete
+- Phase 8: Testing — 🔲 Pending
+
+### Test Results
+- All 95 tests passing (14 Command + 10 PlistReader + 25 ReplacementManager + 8 PlistWriter + 20 OutputFormatter + 18 ErrorHandler)
+- Build: ✅ Success
+
+## [0.6.0] - 2026-03-07
+
+### Added
+- Enhance OutputFormatter with multiple output formats
+  - Table format (existing, with color support)
+  - JSON format for machine-readable output
+  - Summary statistics with counts and breakdown
+  - Color support for terminal output (auto-detection)
+  - Colored status indicators for enabled/disabled items
+- Implement formatted message utilities
+  - formatError() with red color and icon
+  - formatSuccess() with green color and checkmark
+  - formatWarning() with yellow color and warning symbol
+- Create OutputFormatterTests with 20 comprehensive test cases:
+  - List formatting (empty, single, multiple)
+  - Sorting and column width calculations
+  - JSON serialization with multiple items
+  - Summary statistics with variations
+  - Message formatting with colors
+  - Edge cases (special characters, unicode)
+  - Disabled item handling and display
+
+### Changed
+- OutputFormatter now supports multiple output formats
+- Enhanced ColorTerminal detection for better user experience
+
+### Status
+- Phase 1: Project Setup — ✅ Complete
+- Phase 2: CLI Argument Parsing — ✅ Complete
+- Phase 3: Plist Reading — ✅ Complete
+- Phase 4: Data Manipulation — ✅ Complete
+- Phase 5: Plist Writing — ✅ Complete
+- Phase 6: Output Formatting — ✅ Complete
+- Phase 7: Error Handling — 🔲 Pending
+- Phase 8: Testing — 🔲 Pending
+
+### Test Results
+- All 77 tests passing (14 Command + 10 PlistReader + 25 ReplacementManager + 8 PlistWriter + 20 OutputFormatter)
+- Build: ✅ Success
+
+## [0.5.0] - 2026-03-07
+
+### Added
+- Implement PlistWriter class for persisting changes to macOS plist
+  - Write ReplacementItem objects back to NSUserDictionaryReplacementItems
+  - Preserve existing plist keys while updating replacements
+  - Create automatic backups before writing
+  - Serialize swift objects to plist format
+- Implement PlistWriterError enum for error handling
+  - fileNotFound, cannotCreateBackup, serializationFailed, writeFailure
+  - Descriptive error messages for debugging
+- Integrate PlistWriter into main.swift
+  - All add/remove/update operations now persist to disk
+  - Changes are immediately saved to ~/.GlobalPreferences.plist
+  - Proper error handling and rollback on failure
+- Create PlistWriterTests with 8 comprehensive test cases:
+  - Write empty/single/multiple replacements
+  - Preserve enabled/disabled states
+  - Backup creation and error handling
+  - Dictionary conversion validation
+
+### Changed
+- Main entrypoint now persists all changes to plist
+- Add/remove/update commands are now fully permanent
+
+### Status
+- Phase 1: Project Setup — ✅ Complete
+- Phase 2: CLI Argument Parsing — ✅ Complete
+- Phase 3: Plist Reading — ✅ Complete
+- Phase 4: Data Manipulation — ✅ Complete
+- Phase 5: Plist Writing — ✅ Complete
+- Phase 6: Output Formatting — 🔲 Pending
+- Phase 7: Error Handling — 🔲 Pending
+- Phase 8: Testing — 🔲 Pending
+
+### Test Results
+- All 57 tests passing (14 Command + 10 PlistReader + 25 ReplacementManager + 8 PlistWriter)
+- Build: ✅ Success
+
 ## [0.4.0] - 2026-03-07
 
 ### Added
