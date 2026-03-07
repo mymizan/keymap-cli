@@ -54,6 +54,10 @@ class ErrorHandler {
             return "\nHint: Shortcut must not be empty. Use 'keymap add <shortcut> <expansion>'."
         case .emptyExpansion:
             return "\nHint: Expansion must not be empty. Use 'keymap add <shortcut> <expansion>'."
+        case .alreadyEnabled(let shortcut):
+            return "\nHint: Use 'keymap disable \(shortcut)' if you want to turn it off."
+        case .alreadyDisabled(let shortcut):
+            return "\nHint: Use 'keymap enable \(shortcut)' if you want to turn it on."
         case .unknown:
             return "\nHint: Run 'keymap help' for usage information."
         }

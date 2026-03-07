@@ -161,4 +161,94 @@ final class CommandParserTests: XCTestCase {
         }
     }
 
+    // MARK: - Extended Command Parsing Tests
+    
+    func testParseExportCommand() {
+        let args1 = ["keymap", "export"]
+        let cmd1 = CommandParser.parse(arguments: args1)
+        if case .export(let file) = cmd1 {
+            XCTAssertNil(file)
+        } else {
+            XCTFail("Expected export command without path")
+        }
+
+        let args2 = ["keymap", "export", "out.json"]
+        let cmd2 = CommandParser.parse(arguments: args2)
+        if case .export(let file) = cmd2 {
+            XCTAssertEqual(file, "out.json")
+        } else {
+            XCTFail("Expected export command with file path")
+        }
+
+        let args3 = ["keymap", "export", "a", "b"]
+        let cmd3 = CommandParser.parse(arguments: args3)
+        if case .unknown = cmd3 {
+            XCTAssertTrue(true)
+        } else {
+            XCTFail("Expected unknown for too many export args")
+        }
+    }
+    
+    func testParseImportCommand() {
+        let args = ["keymap", "import", "in.json"]
+        let command = CommandParser.parse(arguments: args)
+        if case .import(let file) = command {
+            XCTAssertEqual(file, "in.json")
+        } else {
+            XCTFail("Expected import command")
+        }
+        
+        let bad = ["keymap", "import"]
+        let cmd2 = CommandParser.parse(arguments: bad)
+        if case .unknown = cmd2 {
+            XCTAssertTrue(true)
+        } else {
+            XCTFail("Expected unknown for missing import file")
+        }
+    }
+    
+    func testParseSearchCommand() {
+        let args = ["keymap", "search", "term"]
+        let command = CommandParser.parse(arguments: args)
+        if case .search(let query) = command {
+            XCTAssertEqual(query, "term")
+        } else {
+            XCTFail("Expected search command")
+        }
+        
+        let bad = ["keymap", "search"]
+        let cmd2 = CommandParser.parse(arguments: bad)
+        if case .unknown = cmd2 {
+            XCTAssertTrue(true)
+        } else {
+            XCTFail("Expected unknown for missing search term")
+        }
+    }
+    
+    func testParseEnableDisableCommands() {
+        let en = ["keymap", "enable", "foo"]
+        let cmdE = CommandParser.parse(arguments: en)
+        if case .enable(let s) = cmdE {
+            XCTAssertEqual(s, "foo")
+        } else {
+            XCTFail("Expected enable command")
+        }
+        
+        let dis = ["keymap", "disable", "foo"]
+        let cmdD = CommandParser.parse(arguments: dis)
+        if case .disable(let s) = cmdD {
+            XCTAssertEqual(s, "foo")
+        } else {
+            XCTFail("Expected disable command")
+        }
+        
+        let bad = ["keymap", "enable"]
+        let cmd3 = CommandParser.parse(arguments: bad)
+        if case .unknown = cmd3 {
+            XCTAssertTrue(true)
+        } else {
+            XCTFail("Expected unknown for missing enable shortcut")
+        }
+    }
+
 }

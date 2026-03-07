@@ -37,10 +37,52 @@ All notable changes to this project will be documented in this file.
 - Phase 5: Plist Writing — ✅ Complete
 - Phase 6: Output Formatting — ✅ Complete
 - Phase 7: Error Handling — ✅ Complete
-- Phase 8: Testing — 🔲 Pending
+- Phase 8: Testing — ✅ Complete
 
 ### Test Results
-- All 95 tests passing (14 Command + 10 PlistReader + 25 ReplacementManager + 8 PlistWriter + 20 OutputFormatter + 18 ErrorHandler)
+- All 113 tests passing (updated for integration tests)
+- Build: ✅ Success
+
+## [0.8.0] - 2026-03-07
+
+### Added
+- Phase 8: Comprehensive integration testing across modules
+  - IntegrationTests covering manager workflows, error handling, output formatting, command parsing, data model and full user scenarios
+  - Business logic tests focus on in-memory operations to avoid concurrency issues
+
+### Changed
+- Updated CHANGELOG to reflect Phase 8 completion
+
+### Status
+- Phase 1-8: ✅ Complete
+- Phase 9: 🔲 Pending
+
+### Test Results
+- All 113 tests passing (including new integration tests)
+- Build: ✅ Success
+
+## [0.9.0] - 2026-03-07
+
+### Added
+- Phase 9: New command set including:
+  - `search` for querying shortcuts/expansions
+  - `enable` / `disable` to toggle replacements
+  - `export` to dump replacements as JSON (stdout or file)
+  - `import` to load replacements from JSON file and merge
+- Extended `ReplacementManager` with support methods and new error cases
+- CLI parsing and main logic updated for all new commands
+- CommandParserTests and ReplacementManagerTests expanded accordingly
+- IntegrationTests augmented for search/enable/disable/import/export workflows
+
+### Changed
+- ErrorHandler updated with recovery hints for enable/disable errors
+- CommandParser usage and README updated with new examples
+
+### Status
+- Phases 1-9: ✅ Complete
+
+### Test Results
+- All tests passing (now 131+ total after new additions)
 - Build: ✅ Success
 
 ## [0.6.0] - 2026-03-07

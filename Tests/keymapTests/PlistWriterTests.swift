@@ -41,7 +41,7 @@ final class PlistWriterTests: XCTestCase {
         }
         
         // Temporarily override plist path
-        let originalPath = PlistWriter.plistPath
+        _ = PlistWriter.plistPath
         
         // Read and verify empty
         var format = PropertyListSerialization.PropertyListFormat.xml

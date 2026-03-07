@@ -7,6 +7,8 @@ enum ReplacementManagerError: Error, Equatable {
     case shortcutAlreadyExists(String)
     case emptyShortcut
     case emptyExpansion
+    case alreadyEnabled(String)
+    case alreadyDisabled(String)
     case unknown(String)
     
     var description: String {
@@ -19,6 +21,10 @@ enum ReplacementManagerError: Error, Equatable {
             return "Error: Shortcut cannot be empty."
         case .emptyExpansion:
             return "Error: Expansion cannot be empty."
+        case .alreadyEnabled(let shortcut):
+            return "Error: Shortcut '\(shortcut)' is already enabled."
+        case .alreadyDisabled(let shortcut):
+            return "Error: Shortcut '\(shortcut)' is already disabled."
         case .unknown(let msg):
             return "Error: \(msg)"
         }
@@ -117,5 +123,68 @@ class ReplacementManager {
     /// Get all replacements as array
     func getAll() -> [ReplacementItem] {
         return replacements
+    }
+    
+    // MARK: - Extended Operations (Phase 9)
+    
+    /// Enable an existing shortcut
+    /// - Throws: ReplacementManagerError if not found or already enabled
+    func enableShortcut(_ shortcut: String) throws {
+        guard !shortcut.trimmingCharacters(in: .whitespaces).isEmpty else {
+            throw ReplacementManagerError.emptyShortcut
+        }
+        guard let index = replacements.firstIndex(where: { $0.shortcut == shortcut }) else {
+            throw ReplacementManagerError.shortcutNotFound(shortcut)
+        }
+        if replacements[index].enabled {
+            throw ReplacementManagerError.alreadyEnabled(shortcut)
+        }
+        let item = replacements[index]
+        replacements[index] = ReplacementItem(shortcut: item.shortcut, expansion: item.expansion, enabled: true)
+    }
+    
+    /// Disable an existing shortcut
+    /// - Throws: ReplacementManagerError if not found or already disabled
+    func disableShortcut(_ shortcut: String) throws {
+        guard !shortcut.trimmingCharacters(in: .whitespaces).isEmpty else {
+            throw ReplacementManagerError.emptyShortcut
+        }
+        guard let index = replacements.firstIndex(where: { $0.shortcut == shortcut }) else {
+            throw ReplacementManagerError.shortcutNotFound(shortcut)
+        }
+        if !replacements[index].enabled {
+            throw ReplacementManagerError.alreadyDisabled(shortcut)
+        }
+        let item = replacements[index]
+        replacements[index] = ReplacementItem(shortcut: item.shortcut, expansion: item.expansion, enabled: false)
+    }
+    
+    /// Search for replacements matching a query in shortcut or expansion
+    func search(_ query: String) -> [ReplacementItem] {
+        guard !query.isEmpty else { return [] }
+        return replacements.filter { item in
+            item.shortcut.localizedCaseInsensitiveContains(query) ||
+            item.expansion.localizedCaseInsensitiveContains(query)
+        }.sorted { $0.shortcut < $1.shortcut }
+    }
+    
+    /// Import a collection of replacement items, updating existing entries and adding new ones
+    /// - Returns: Number of items processed
+    func importItems(_ items: [ReplacementItem]) -> Int {
+        var count = 0
+        for newItem in items {
+            if let index = replacements.firstIndex(where: { $0.shortcut == newItem.shortcut }) {
+                replacements[index] = newItem
+            } else {
+                replacements.append(newItem)
+            }
+            count += 1
+        }
+        return count
+    }
+    
+    /// Export current replacements (sorted)
+    func exportItems() -> [ReplacementItem] {
+        return listShortcuts()
     }
 }

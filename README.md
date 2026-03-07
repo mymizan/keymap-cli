@@ -19,4 +19,9 @@ keymap add <shortcut> <expansion>
 keymap remove <shortcut>
 keymap update <shortcut> <expansion>
 keymap list
+keymap search <query>
+keymap enable <shortcut>
+keymap disable <shortcut>
+keymap export [file]
+keymap import <file>
 ```

@@ -7,9 +7,9 @@ let command = CommandParser.parse(arguments: arguments)
 // Validate environment before operations that modify files
 func needsEnvironmentValidation(_ command: Command) -> Bool {
     switch command {
-    case .add, .remove, .update:
+    case .add, .remove, .update, .import, .enable, .disable:
         return true
-    case .list, .help, .unknown:
+    case .list, .export, .search, .help, .unknown:
         return false
     }
 }
@@ -125,6 +125,86 @@ case .list:
         print(OutputFormatter.formatWarning("No text replacements found."))
     } else {
         print(OutputFormatter.formatList(shortcuts))
+    }
+    
+case .export(let file):
+    let items = manager.exportItems()
+    let encoder = JSONEncoder()
+    encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+    if let data = try? encoder.encode(items), let jsonString = String(data: data, encoding: .utf8) {
+        if let path = file {
+            // attempt to write to given path
+            do {
+                try jsonString.write(toFile: path, atomically: true, encoding: .utf8)
+                print(OutputFormatter.formatSuccess("Exported to \(path)"))
+            } catch {
+                ErrorHandler.handle(error, context: "exporting to \(path)")
+                exit(1)
+            }
+        } else {
+            print(jsonString)
+        }
+    } else {
+        print(OutputFormatter.formatError("Failed to serialize export data"))
+        exit(1)
+    }
+    
+case .import(let file):
+    // read JSON file and merge
+    do {
+        let data = try Data(contentsOf: URL(fileURLWithPath: file))
+        let decoded = try JSONDecoder().decode([ReplacementItem].self, from: data)
+        _ = manager.importItems(decoded)
+        try PlistWriter.writeReplacements(manager.getAll())
+        print(OutputFormatter.formatSuccess("Imported \(decoded.count) replacements from \(file)"))
+    } catch let error as ReplacementManagerError {
+        ErrorHandler.handle(error, context: "importing replacements")
+        exit(1)
+    } catch {
+        ErrorHandler.handle(error, context: "importing from \(file)")
+        exit(1)
+    }
+    
+case .search(let query):
+    let results = manager.search(query)
+    if results.isEmpty {
+        print(OutputFormatter.formatWarning("No results for '\(query)'"))
+    } else {
+        print(OutputFormatter.formatList(results))
+    }
+    
+case .enable(let shortcut):
+    guard ErrorHandler.validateInput(shortcut: shortcut) else { exit(1) }
+    do {
+        try manager.enableShortcut(shortcut)
+        try PlistWriter.writeReplacements(manager.getAll())
+        print(OutputFormatter.formatSuccess("Enabled: '\(shortcut)'"))
+    } catch let error as ReplacementManagerError {
+        ErrorHandler.handle(error, context: "enable shortcut")
+        exit(1)
+    } catch let error as PlistWriterError {
+        ErrorHandler.handle(error, context: "saving changes")
+        exit(1)
+    } catch {
+        ErrorHandler.handle(error, context: "enable shortcut")
+        exit(1)
+    }
+    
+case .disable(let shortcut):
+    guard ErrorHandler.validateInput(shortcut: shortcut) else { exit(1) }
+    do {
+        try manager.disableShortcut(shortcut)
+        try PlistWriter.writeReplacements(manager.getAll())
+        print(OutputFormatter.formatSuccess("Disabled: '\(shortcut)'"))
+    } catch let error as ReplacementManagerError {
+        ErrorHandler.handle(error, context: "disable shortcut")
+        exit(1)
+    } catch let error as PlistWriterError {
+        ErrorHandler.handle(error, context: "saving changes")
+        exit(1)
+    } catch {
+        ErrorHandler.handle(error, context: "disable shortcut")
+        exit(1)
     }
     
 case .help:

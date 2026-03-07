@@ -216,6 +216,76 @@ final class ReplacementManagerTests: XCTestCase {
         XCTAssertEqual(list1, list2)
     }
     
+    // MARK: - Extended Operation Tests
+
+    func testEnableDisableShortcut() throws {
+        try manager.addShortcut("foo", expansion: "bar")
+        // enable when already enabled should throw
+        XCTAssertThrowsError(try manager.enableShortcut("foo")) { error in
+            if case .alreadyEnabled(let shortcut) = error as? ReplacementManagerError {
+                XCTAssertEqual(shortcut, "foo")
+            } else {
+                XCTFail("Expected alreadyEnabled error")
+            }
+        }
+
+        // disable works
+        try manager.disableShortcut("foo")
+        XCTAssertFalse(manager.getReplacement("foo")?.enabled ?? true)
+
+        // disabling again throws
+        XCTAssertThrowsError(try manager.disableShortcut("foo")) { error in
+            if case .alreadyDisabled(let shortcut) = error as? ReplacementManagerError {
+                XCTAssertEqual(shortcut, "foo")
+            } else {
+                XCTFail("Expected alreadyDisabled error")
+            }
+        }
+
+        // enabling now works
+        try manager.enableShortcut("foo")
+        XCTAssertTrue(manager.getReplacement("foo")?.enabled ?? false)
+    }
+
+    func testSearchFunctionality() throws {
+        try manager.addShortcut("alpha", expansion: "first")
+        try manager.addShortcut("beta", expansion: "second")
+        try manager.addShortcut("gamma", expansion: "third")
+
+        let results1 = manager.search("a")
+        XCTAssertEqual(results1.map { $0.shortcut }.sorted(), ["alpha", "gamma"])
+
+        let results2 = manager.search("beta")
+        XCTAssertEqual(results2.count, 1)
+        XCTAssertEqual(results2[0].shortcut, "beta")
+
+        let results3 = manager.search("")
+        XCTAssertEqual(results3.count, 0)
+    }
+
+    func testImportExport() throws {
+        // prepare initial
+        try manager.addShortcut("one", expansion: "1")
+        try manager.addShortcut("two", expansion: "2")
+
+        let exported = manager.exportItems()
+        XCTAssertEqual(exported.count, 2)
+        XCTAssertEqual(exported.map { $0.shortcut }, ["one", "two"])
+
+        // import new and update existing
+        let newItems = [
+            ReplacementItem(shortcut: "two", expansion: "two-updated", enabled: false),
+            ReplacementItem(shortcut: "three", expansion: "3", enabled: true)
+        ]
+        let count = manager.importItems(newItems)
+        XCTAssertEqual(count, 2)
+
+        XCTAssertEqual(manager.count(), 3)
+        XCTAssertEqual(manager.getReplacement("two")?.expansion, "two-updated")
+        XCTAssertFalse(manager.getReplacement("two")?.enabled ?? true)
+        XCTAssertEqual(manager.getReplacement("three")?.expansion, "3")
+    }
+
     // MARK: - Integration Tests
     
     func testAddUpdateRemoveFlow() throws {
@@ -275,6 +345,8 @@ final class ReplacementManagerTests: XCTestCase {
         XCTAssertTrue(ReplacementManagerError.emptyExpansion.description.contains("empty"))
         XCTAssertTrue(ReplacementManagerError.shortcutNotFound("test").description.contains("not found"))
         XCTAssertTrue(ReplacementManagerError.shortcutAlreadyExists("test").description.contains("already exists"))
+        XCTAssertTrue(ReplacementManagerError.alreadyEnabled("test").description.contains("already enabled"))
+        XCTAssertTrue(ReplacementManagerError.alreadyDisabled("test").description.contains("already disabled"))
     }
 
 }

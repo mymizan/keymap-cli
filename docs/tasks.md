@@ -99,16 +99,18 @@ verify macOS text replacement reflects changes
 
 ---
 
-## Phase 9 — Future Improvements
+## Phase 9 — Future Improvements (Completed)
 
-Optional commands:
+Optional commands implemented:
 
-keymap export
+- keymap export
+- keymap import
+- keymap search
+- keymap enable
+- keymap disable
 
-keymap import
+These all have associated tests and CLI support.
 
-keymap search
+## Phase 10 — GUI
 
-keymap enable
-
-keymap disable
+(Remains as a potential future enhancement.)
