@@ -1,6 +1,6 @@
 # Implementation Tasks
 
-## Phase 1 — Project Setup
+## Phase 1 — Project Setup ✅
 
 - Initialize Swift CLI project using Swift Package Manager
 - Create main command entrypoint
@@ -8,7 +8,7 @@
 
 ---
 
-## Phase 2 — CLI Argument Parsing
+## Phase 2 — CLI Argument Parsing ✅
 
 Implement commands:
 
@@ -24,7 +24,7 @@ Validate arguments and print usage if incorrect.
 
 ---
 
-## Phase 3 — Plist Reading
+## Phase 3 — Plist Reading ✅
 
 - Locate plist:
 
@@ -38,7 +38,7 @@ NSUserDictionaryReplacementItems
 
 ---
 
-## Phase 4 — Data Manipulation
+## Phase 4 — Data Manipulation ✅
 
 Implement functions:
 
@@ -54,7 +54,7 @@ Ensure duplicates are handled properly.
 
 ---
 
-## Phase 5 — Plist Writing
+## Phase 5 — Plist Writing ✅
 
 - Serialize updated data
 - Write plist back to disk
@@ -62,7 +62,7 @@ Ensure duplicates are handled properly.
 
 ---
 
-## Phase 6 — Output Formatting
+## Phase 6 — Output Formatting ✅
 
 Format list output:
 
@@ -72,7 +72,7 @@ x.oc            npm install v24.14.0
 
 ---
 
-## Phase 7 — Error Handling
+## Phase 7 — Error Handling ✅
 
 Handle cases:
 
@@ -83,7 +83,7 @@ Handle cases:
 
 ---
 
-## Phase 8 — Testing
+## Phase 8 — Testing ✅
 
 Test scenarios:
 
@@ -99,7 +99,7 @@ verify macOS text replacement reflects changes
 
 ---
 
-## Phase 9 — Future Improvements (Completed)
+## Phase 9 — Future Improvements ✅
 
 Optional commands implemented:
 
@@ -110,7 +110,3 @@ Optional commands implemented:
 - keymap disable
 
 These all have associated tests and CLI support.
-
-## Phase 10 — GUI
-
-(Remains as a potential future enhancement.)
