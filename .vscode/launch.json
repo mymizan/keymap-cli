@@ -1,0 +1,44 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:keymap-cli}",
+            "name": "Debug keymap-cli",
+            "target": "keymap-cli",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug keymap-cli"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:keymap-cli}",
+            "name": "Release keymap-cli",
+            "target": "keymap-cli",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release keymap-cli"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:keymap-cli}",
+            "name": "Debug keymap",
+            "target": "keymap",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug keymap"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:keymap-cli}",
+            "name": "Release keymap",
+            "target": "keymap",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release keymap"
+        }
+    ]
+}
