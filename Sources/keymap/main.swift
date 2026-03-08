@@ -18,10 +18,10 @@ if needsEnvironmentValidation(command) && !ErrorHandler.validateEnvironment() {
     exit(1)
 }
 
-// Load existing replacements from plist
+// Load existing replacements from storage
 var manager: ReplacementManager
 do {
-    let existingReplacements = try PlistReader.loadReplacements()
+    let existingReplacements = try TextReplacementStorage.loadReplacements()
     manager = ReplacementManager(replacements: existingReplacements)
 } catch {
     manager = ReplacementManager()  // Initialize with empty manager
@@ -52,13 +52,13 @@ case .add(let shortcut, let expansion):
     
     do {
         try manager.addShortcut(shortcut, expansion: expansion)
-        // Write changes back to plist
-        try PlistWriter.writeReplacements(manager.getAll())
+        // Write changes back to storage
+        try TextReplacementStorage.writeReplacements(manager.getAll())
         print(OutputFormatter.formatSuccess("Added: '\(shortcut)' → '\(expansion)'"))
     } catch let error as ReplacementManagerError {
         ErrorHandler.handle(error, context: "add shortcut")
         exit(1)
-    } catch let error as PlistWriterError {
+    } catch let error as TextReplacementStorageError {
         ErrorHandler.handle(error, context: "saving changes")
         exit(1)
     } catch let error as NSError {
@@ -77,13 +77,13 @@ case .remove(let shortcut):
     
     do {
         try manager.removeShortcut(shortcut)
-        // Write changes back to plist
-        try PlistWriter.writeReplacements(manager.getAll())
+        // Write changes back to storage
+        try TextReplacementStorage.writeReplacements(manager.getAll())
         print(OutputFormatter.formatSuccess("Removed: '\(shortcut)'"))
     } catch let error as ReplacementManagerError {
         ErrorHandler.handle(error, context: "remove shortcut")
         exit(1)
-    } catch let error as PlistWriterError {
+    } catch let error as TextReplacementStorageError {
         ErrorHandler.handle(error, context: "saving changes")
         exit(1)
     } catch let error as NSError {
@@ -102,13 +102,13 @@ case .update(let shortcut, let expansion):
     
     do {
         try manager.updateShortcut(shortcut, expansion: expansion)
-        // Write changes back to plist
-        try PlistWriter.writeReplacements(manager.getAll())
+        // Write changes back to storage
+        try TextReplacementStorage.writeReplacements(manager.getAll())
         print(OutputFormatter.formatSuccess("Updated: '\(shortcut)' → '\(expansion)'"))
     } catch let error as ReplacementManagerError {
         ErrorHandler.handle(error, context: "update shortcut")
         exit(1)
-    } catch let error as PlistWriterError {
+    } catch let error as TextReplacementStorageError {
         ErrorHandler.handle(error, context: "saving changes")
         exit(1)
     } catch let error as NSError {
@@ -155,7 +155,7 @@ case .import(let file):
         let data = try Data(contentsOf: URL(fileURLWithPath: file))
         let decoded = try JSONDecoder().decode([ReplacementItem].self, from: data)
         _ = manager.importItems(decoded)
-        try PlistWriter.writeReplacements(manager.getAll())
+        try TextReplacementStorage.writeReplacements(manager.getAll())
         print(OutputFormatter.formatSuccess("Imported \(decoded.count) replacements from \(file)"))
     } catch let error as ReplacementManagerError {
         ErrorHandler.handle(error, context: "importing replacements")
@@ -177,12 +177,12 @@ case .enable(let shortcut):
     guard ErrorHandler.validateInput(shortcut: shortcut) else { exit(1) }
     do {
         try manager.enableShortcut(shortcut)
-        try PlistWriter.writeReplacements(manager.getAll())
+        try TextReplacementStorage.writeReplacements(manager.getAll())
         print(OutputFormatter.formatSuccess("Enabled: '\(shortcut)'"))
     } catch let error as ReplacementManagerError {
         ErrorHandler.handle(error, context: "enable shortcut")
         exit(1)
-    } catch let error as PlistWriterError {
+    } catch let error as TextReplacementStorageError {
         ErrorHandler.handle(error, context: "saving changes")
         exit(1)
     } catch {
@@ -194,12 +194,12 @@ case .disable(let shortcut):
     guard ErrorHandler.validateInput(shortcut: shortcut) else { exit(1) }
     do {
         try manager.disableShortcut(shortcut)
-        try PlistWriter.writeReplacements(manager.getAll())
+        try TextReplacementStorage.writeReplacements(manager.getAll())
         print(OutputFormatter.formatSuccess("Disabled: '\(shortcut)'"))
     } catch let error as ReplacementManagerError {
         ErrorHandler.handle(error, context: "disable shortcut")
         exit(1)
-    } catch let error as PlistWriterError {
+    } catch let error as TextReplacementStorageError {
         ErrorHandler.handle(error, context: "saving changes")
         exit(1)
     } catch {

@@ -30,12 +30,9 @@ class ErrorHandler {
         if let managerError = error as? ReplacementManagerError {
             message += managerError.description
             message += recoveryForManagerError(managerError)
-        } else if let writerError = error as? PlistWriterError {
-            message += writerError.description
-            message += recoveryForWriterError(writerError)
-        } else if let readerError = error as? PlistReaderError {
-            message += readerError.description
-            message += recoveryForReaderError(readerError)
+        } else if let storageError = error as? TextReplacementStorageError {
+            message += storageError.description
+            message += recoveryForStorageError(storageError)
         } else {
             message += "Error: \(error.localizedDescription)"
         }
@@ -63,14 +60,16 @@ class ErrorHandler {
         }
     }
     
-    private static func recoveryForWriterError(_ error: PlistWriterError) -> String {
+    private static func recoveryForStorageError(_ error: TextReplacementStorageError) -> String {
         switch error {
-        case .fileNotFound:
-            return "\nHint: macOS text replacement file doesn't exist. Check ~/.GlobalPreferences.plist"
-        case .cannotCreateBackup:
-            return "\nHint: Check disk space and file permissions for ~/.GlobalPreferences.plist"
-        case .serializationFailed:
-            return "\nHint: Invalid replacement data. Run 'keymap list' to verify."
+        case .databaseNotFound:
+            return "\nHint: macOS text replacement database doesn't exist. Will fall back to plist."
+        case .plistNotFound:
+            return "\nHint: macOS text replacement plist doesn't exist. Check ~/.GlobalPreferences.plist"
+        case .invalidFormat:
+            return "\nHint: Storage has invalid format. Try restoring from backup."
+        case .decodingError:
+            return "\nHint: Storage may be corrupted. Try restoring from backup."
         case .writeFailure(let msg):
             return "\nHint: \(msg). Check disk space and file permissions."
         case .unknown:
@@ -78,51 +77,32 @@ class ErrorHandler {
         }
     }
     
-    private static func recoveryForReaderError(_ error: PlistReaderError) -> String {
-        switch error {
-        case .fileNotFound:
-            return "\nHint: Create text replacements in System Settings first."
-        case .invalidFormat:
-            return "\nHint: Backup plist file and restore from Time Machine."
-        case .decodingError:
-            return "\nHint: Plist may be corrupted. Try restoring from backup."
-        case .unknown:
-            return "\nHint: Check system logs for more information."
-        }
-    }
-    
     /// Check for common issues before operations
     static func validateEnvironment() -> Bool {
         let fileManager = FileManager.default
+        let databasePath = (NSString("~/Library/KeyboardServices/TextReplacements.db")).expandingTildeInPath
         let plistPath = (NSString("~/Library/Preferences/.GlobalPreferences.plist")).expandingTildeInPath
         
-        // Check if plist exists
-        if !fileManager.fileExists(atPath: plistPath) {
+        // Check if either database or plist exists and is writable
+        let hasDatabase = fileManager.fileExists(atPath: databasePath) && fileManager.isWritableFile(atPath: databasePath)
+        let hasPlist = fileManager.fileExists(atPath: plistPath) && fileManager.isWritableFile(atPath: plistPath)
+        
+        if !hasDatabase && !hasPlist {
+            // Try to create plist as fallback
             let parentDir = (plistPath as NSString).deletingLastPathComponent
             if !fileManager.fileExists(atPath: parentDir) {
                 print("Error: Library/Preferences directory not found.")
                 return false
             }
-            // Create empty plist if it doesn't exist
+            // Create empty plist
             let emptyPlist: [String: Any] = ["NSUserDictionaryReplacementItems": []]
             do {
-                let data = try PropertyListSerialization.data(
-                    fromPropertyList: emptyPlist,
-                    format: .xml,
-                    options: 0
-                )
+                let data = try PropertyListSerialization.data(fromPropertyList: emptyPlist, format: .xml, options: 0)
                 fileManager.createFile(atPath: plistPath, contents: data, attributes: nil)
             } catch {
                 print("Error: Could not create plist file.")
                 return false
             }
-        }
-        
-        // Check write permissions
-        if !fileManager.isWritableFile(atPath: plistPath) {
-            print("Error: No write permission for ~/.GlobalPreferences.plist")
-            print("Hint: Check file permissions or run with appropriate privileges.")
-            return false
         }
         
         return true

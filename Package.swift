@@ -10,7 +10,10 @@ let package = Package(
     ],
     targets: [
         .executableTarget(
-            name: "keymap"),
+            name: "keymap",
+            linkerSettings: [
+                .linkedLibrary("sqlite3")
+            ]),
         .testTarget(
             name: "keymapTests",
             dependencies: ["keymap"]),

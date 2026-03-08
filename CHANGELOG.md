@@ -2,6 +2,58 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.9.3] - 2026-03-08
+
+### Added
+- **Cross-Platform Compatibility**: Unified storage system supporting both modern macOS (database) and legacy macOS (plist)
+  - Automatic detection of available storage method
+  - Falls back to plist storage on older macOS versions
+  - Maintains full functionality across macOS versions
+
+### Changed
+- Storage system now uses `TextReplacementStorage` class with automatic fallback
+- Error handling updated for unified storage errors
+- Environment validation checks for both database and plist availability
+
+### Fixed
+- Ensured compatibility with macOS versions that don't have TextReplacements.db
+- Graceful fallback to GlobalPreferences.plist on systems without database
+
+### Status
+- Compatible with macOS Tahoe (15.x) and newer (database storage)
+- Compatible with macOS Ventura (13.x) and older (plist storage)
+- All functionality preserved across versions
+
+### Test Results
+- Verified database storage on modern macOS
+- Confirmed plist fallback mechanism
+- Build: ✅ Success
+
+## [0.9.2] - 2026-03-08
+
+### Fixed
+- **CRITICAL BUG FIX**: Updated storage backend to use macOS TextReplacements database instead of deprecated GlobalPreferences plist
+  - Changed from ~/.GlobalPreferences.plist to ~/Library/KeyboardServices/TextReplacements.db
+  - Updated PlistReader to DatabaseReader using SQLite3
+  - Updated PlistWriter to DatabaseWriter with proper transaction handling
+  - Added SQLite3 dependency to Package.swift
+  - Updated error handling and validation for database operations
+  - Fixed compatibility with macOS Tahoe (15.x) and newer versions
+
+### Changed
+- Storage classes renamed from Plist* to Database*
+- Error messages updated to reference correct database path
+- Environment validation now checks for TextReplacements.db existence
+
+### Status
+- All functionality working with new macOS text replacement storage
+- Backward compatibility maintained for existing CLI interface
+
+### Test Results
+- Core functionality verified: add, remove, update, list operations work correctly
+- Database read/write operations confirmed working
+- Build: ✅ Success
+
 ## [0.7.0] - 2026-03-07
 
 ### Added
